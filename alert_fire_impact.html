@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Fire Impact Subscribe Alert</title>
+<style>
+  :root{
+    --red:#ff3b3b;
+    --deep:#9b0000;
+    --glow: 0 0 20px rgba(255,59,59,0.9), 0 0 60px rgba(255,20,20,0.35);
+  }
+  html,body{
+    height:100%;
+    margin:0;
+    background:transparent;
+    overflow:hidden;
+    font-family: "Segoe UI", Roboto, system-ui, Arial, sans-serif;
+  }
+
+  .wrap{
+    width:100%;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    padding-top:70px;
+    pointer-events:none;
+  }
+
+  .alert {
+    position:relative;
+    width:86%;
+    max-width:740px;
+    background: linear-gradient(180deg, rgba(30,0,0,0.45), rgba(0,0,0,0.2));
+    border-radius:28px;
+    border: 2px solid rgba(255,80,80,0.14);
+    padding:20px 22px;
+    display:flex;
+    gap:16px;
+    align-items:center;
+    box-shadow: var(--glow);
+    transform-origin:center;
+    pointer-events:auto;
+  }
+
+  .impact {
+    width:86px;
+    height:86px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: radial-gradient(circle at 30% 25%, rgba(255,160,120,1) 0%, rgba(255,80,40,0.9) 20%, rgba(155,0,0,0.6) 55%, rgba(0,0,0,0) 70%);
+    box-shadow: 0 0 30px rgba(255,60,60,0.5), inset 0 6px 18px rgba(255,120,80,0.3);
+    overflow:visible;
+    z-index:2;
+    animation: impactPop 0.7s cubic-bezier(.2,.9,.2,1) forwards;
+  }
+
+  .impact::after{
+    content: "";
+    position:absolute;
+    width:180px;
+    height:180px;
+    border-radius:50%;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%) scale(0.2);
+    box-shadow: 0 0 80px rgba(255,60,60,0.6), 0 0 160px rgba(255,40,40,0.25);
+    opacity:0.0;
+    animation: ring 0.9s ease-out forwards;
+    pointer-events:none;
+  }
+
+  @keyframes impactPop{
+    0% { transform: scale(0.6) rotate(-6deg); filter: blur(2px); }
+    50% { transform: scale(1.05) rotate(3deg); filter: blur(0px); }
+    100% { transform: scale(1) rotate(0deg); filter: blur(0px); }
+  }
+
+  @keyframes ring{
+    0% { transform:translate(-50%,-50%) scale(0.2); opacity:0.9; }
+    60% { transform:translate(-50%,-50%) scale(1.15); opacity:0.55; }
+    100% { transform:translate(-50%,-50%) scale(1.6); opacity:0; }
+  }
+
+  .flame {
+    position:absolute;
+    bottom:-8px;
+    left:50%;
+    transform:translateX(-50%);
+    width:120px;
+    height:60px;
+    background: radial-gradient(circle at 50% 30%, rgba(255,200,80,0.85) 0%, rgba(255,70,20,0.9) 30%, rgba(155,0,0,0.6) 60%, rgba(0,0,0,0) 75%);
+    filter: blur(6px);
+    opacity:0.95;
+    border-radius:40% 40% 50% 50%;
+    animation: flicker 0.9s infinite;
+    z-index:1;
+    pointer-events:none;
+  }
+
+  @keyframes flicker{
+    0%{ transform: translateX(-50%) scaleX(0.95) translateY(0); opacity:0.95; }
+    50%{ transform: translateX(-48%) scaleX(1.05) translateY(-3px); opacity:1; }
+    100%{ transform: translateX(-50%) scaleX(0.98) translateY(0); opacity:0.96; }
+  }
+
+  .text {
+    flex:1;
+    color:#fff;
+    text-shadow: 0 0 10px rgba(255,80,80,0.8);
+  }
+
+  .line1 {
+    font-size:18px;
+    font-weight:700;
+    color:var(--red);
+    text-transform:uppercase;
+    letter-spacing:1.6px;
+    margin-bottom:6px;
+  }
+
+  .line2 {
+    font-size:34px;
+    font-weight:900;
+    color:#fff;
+    letter-spacing:1px;
+    display:flex;
+    gap:8px;
+    align-items:center;
+  }
+
+  .subname {
+    background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    padding:6px 12px;
+    border-radius:999px;
+    font-weight:800;
+    color:#fff;
+    text-shadow: 0 0 12px rgba(255,40,40,0.9);
+  }
+
+  .channel {
+    font-size:12px;
+    color: #ffd6d6;
+    margin-top:6px;
+    opacity:0.95;
+  }
+
+  .hide {
+    animation: fadeOut 0.8s ease-in forwards;
+  }
+
+  @keyframes fadeOut{
+    to { opacity:0; transform: translateY(-8px) scale(0.98); }
+  }
+
+  #playFallback {
+    position:fixed;
+    left:50%;
+    transform:translateX(-50%);
+    bottom:18px;
+    background:linear-gradient(180deg,var(--red),var(--deep));
+    color:white;
+    border:none;
+    padding:10px 18px;
+    border-radius:999px;
+    font-weight:800;
+    display:none;
+    z-index:9999;
+    cursor:pointer;
+  }
+
+  body,html { background: transparent !important; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="alert" id="alertBox">
+      <div class="impact">
+        <div class="flame"></div>
+      </div>
+      <div class="text">
+        <div class="line1">New Subscriber</div>
+        <div class="line2">
+          <div class="subname" id="username">Viewer</div>
+        </div>
+        <div class="channel" id="channelLabel">joined NeoPanelX</div>
+      </div>
+    </div>
+  </div>
+
+  <button id="playFallback">Play alert</button>
+
+  <audio id="alertAudio" preload="auto">
+    <source src="https://wiuaahq-pixel.github.io/neopanelx-alert/unbelievable_ff_alert_5s.mp3" type="audio/mpeg">
+  </audio>
+
+<script>
+  function qget(key){
+    const p = new URLSearchParams(window.location.search);
+    return p.get(key);
+  }
+
+  const username = qget('name') || 'New Viewer';
+  const channel = qget('channel') || 'joined NeoPanelX';
+
+  document.getElementById('username').textContent = username;
+  document.getElementById('channelLabel').textContent = channel;
+
+  const audio = document.getElementById('alertAudio');
+  const box = document.getElementById('alertBox');
+  const playFallback = document.getElementById('playFallback');
+
+  function fireAlert(){
+    box.classList.remove('hide');
+    box.style.animation = 'none';
+    void box.offsetWidth;
+    box.style.animation = '';
+
+    audio.currentTime = 0;
+    audio.play().catch(() => {
+      playFallback.style.display = 'block';
+    });
+
+    setTimeout(()=> box.classList.add('hide'), 3800);
+  }
+
+  playFallback.addEventListener('click', () => {
+    audio.play().catch(()=>{});
+    playFallback.style.display = 'none';
+  });
+
+  window.addEventListener('load', () => {
+    setTimeout(fireAlert, 250);
+  });
+
+  window.triggerNeoAlert = function(name, ch){
+    if(name) document.getElementById('username').textContent = name;
+    if(ch) document.getElementById('channelLabel').textContent = ch;
+    fireAlert();
+  };
+</script>
+</body>
+</html>
